@@ -1,12 +1,7 @@
 const  app = function(){
   // console.log("onload called");
   const url = "https://restcountries.eu/rest/v2/all";
-  // const button = document.getElementById("display-button");
-  //
-  // const handleButtonClicked = function(){
-  //   makeRequest(url, requestComplete);
-  // }
-  //
+
   // // requestComplete is a callback for when the request is um completed.
   // button.addEventListener("click", handleButtonClicked)
   makeRequest(url, requestComplete);
@@ -29,29 +24,65 @@ const requestComplete = function(){
   const jsonString = this.responseText;
   // console.log(jsonString);
   // Parse the string into an array of objects
+
+  let savedCountry = JSON.parse(localStorage.getItem('country'))
+  // console.log("savedCoutry", savedCountry);
+  // stringCountry = JSON.parse(savedCountry);
+  // console.log(stringCountry);
+  displayCountryDetails(savedCountry);
+
   const countries = JSON.parse(jsonString);
   populateDropDown(countries);
-   // populateList(countries);
+  // populateList(countries);
 }
 
 const populateDropDown = function(countries){
   const select = document.getElementById("countries-list");
   countries.forEach(function(country){
     const option = document.createElement("option");
-      option.innerText = country.name;
-      select.appendChild(option);
+    option.innerText = country.name;
+    select.appendChild(option);
   })
-}
+  select.addEventListener('change', function(){
+    getCountryDetails(countries, this.value)});
+  }
 
-// const populateList = function(countries){
-//   // console.log(countries[244]);
-//   const ul = document.getElementById("country-list")
-//
-//   countries.forEach(function(country){
-//     const li = document.createElement("li");
-//     li.innerText = country.name;
-//     ul.appendChild(li);
-//   })
-// }
+  const getCountryDetails = function(countries, countryName){
+    countries.forEach(function(country){
+      if (country.name === countryName){
+        displayCountryDetails(country);
+      }
+    })
+  }
 
-document.addEventListener('DOMContentLoaded', app);
+  const displayCountryDetails = function(country){
+    // li_clearer();
+
+
+    // console.log(country.name, country.population, country.capital);
+    const ul = document.getElementById("country-detail-list");
+    const li_name = document.createElement("li");
+    li_name.setAttribute("id", "li_name");
+    li_name.innerText = " ";
+    li_name.innerText = "Country: " + country.name;
+    const li_capital = document.createElement("li");
+    li_capital.setAttribute("id", "li_capital");
+    li_capital.innerText = " ";
+    li_capital.innerText = "Capital: " + country.capital;
+    const li_population = document.createElement("li");
+    li_population.setAttribute("id", "li_population");
+    li_population.innerText = " ";
+    li_population.innerText = "Population: " + country.population;
+    // ul.clear();
+    ul.appendChild(li_name);
+    ul.appendChild(li_capital);
+    ul.appendChild(li_population);
+
+    persistCountry(country);
+  }
+
+  const persistCountry = function(country){
+    localStorage.setItem('country', [JSON.stringify(country)]);
+  }
+
+  document.addEventListener('DOMContentLoaded', app);
